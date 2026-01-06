@@ -1,0 +1,52 @@
+@import "@fontsource/oswald/300.css";
+@import "@fontsource/oswald/400.css";
+@import "@fontsource/oswald/500.css";
+@import "@fontsource/oswald/700.css";
+@import "@fontsource/roboto-mono/300.css";
+@import "@fontsource/roboto-mono/400.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #FFC300; /* Default Mustard Background */
+}
+.dark body {
+  background-color: #050505; /* Dark Mode Black Background */
+}
+
+/* DOMINANT SELECTION COLOR - INVERTED */
+::selection {
+  background-color: #000000;
+  color: #FFC300;
+}
+.dark ::selection {
+  background-color: #FFC300;
+  color: #000000;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #e6b000;
+}
+.dark ::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+::-webkit-scrollbar-thumb {
+  background: #000000; /* Black Thumb on Mustard */
+  border: 2px solid #FFC300;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #FFC300; /* Mustard Thumb on Black */
+  border: 2px solid #000;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #333;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #e6b000;
+}
