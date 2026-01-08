@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { EventsDto, MerchandiseDto, TrackDto } from '../types';
 
-const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:8080/api';
+const DEFAULT_API_BASE_URL = 'https://music-0o1i.onrender.com/api';
+const API_BASE_URL = String((import.meta as any).env?.VITE_API_BASE_URL || DEFAULT_API_BASE_URL).replace(/\/+$/, '');
 
 const api = axios.create({
   baseURL: API_BASE_URL,

@@ -69,17 +69,15 @@ Before running the project, ensure you have the following installed:
 Here is how to modify specific parts of the application:
 
 ### 1. Changing API Endpoints
-If your backend is hosted on a live server (e.g., AWS, Heroku) instead of localhost, update the connection string.
+The frontend reads the backend URL from a Vite environment variable.
 
 *   **File:** `services/api.ts`
 *   **Line:** ~4
-*   **Action:** Change the `API_BASE_URL` constant.
+*   **Action:** Set `VITE_API_BASE_URL` in `.env.local` (local dev) or in your hosting provider's environment variables (production).
     ```typescript
-    // Local
-    const API_BASE_URL = 'http://localhost:8080/api';
-    
-    // Production Example
-    // const API_BASE_URL = 'https://api.djpimpim.com/api';
+    // Example values
+    // VITE_API_BASE_URL=http://localhost:8080/api
+    // VITE_API_BASE_URL=https://music-0o1i.onrender.com/api
     ```
 
 ### 2. Social Media Links
