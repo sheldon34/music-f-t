@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { CreateEventForm, CreateMerchForm, CreateTrackForm } from '../components/AdminForms';
+import { CreateEventForm, CreateMerchForm, CreateTrackForm, ManageUsersForm } from '../components/AdminForms';
 import { useAuth } from '../context/AuthContext';
-import { Plus, Box, Calendar, Music } from 'lucide-react';
+import { Plus, Box, Calendar, Music, Users } from 'lucide-react';
 import SEO from '../components/SEO';
 import Loading from '../components/Loading';
 
 const AdminDashboard = () => {
   const { isAuthenticated, isAdmin, isLoading, login } = useAuth();
-  const [activeTab, setActiveTab] = useState<'EVENTS' | 'MERCH' | 'TRACKS'>('EVENTS');
+  const [activeTab, setActiveTab] = useState<'EVENTS' | 'MERCH' | 'TRACKS' | 'USERS'>('EVENTS');
 
   if (isLoading) {
       return <Loading />;
@@ -34,7 +34,7 @@ const AdminDashboard = () => {
         <span className="text-brand-accent">///</span> ADMIN CONSOLE
       </h1>
 
-      <div className="grid grid-cols-3 gap-4 mb-12">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
         <button 
           onClick={() => setActiveTab('EVENTS')}
           className={`py-4 border flex flex-col items-center justify-center gap-2 transition-all ${activeTab === 'EVENTS' ? 'bg-neutral-900 text-white dark:bg-white dark:text-black border-neutral-900 dark:border-white' : 'border-neutral-300 dark:border-neutral-800 text-neutral-500 hover:border-neutral-500'}`}
@@ -56,18 +56,26 @@ const AdminDashboard = () => {
           <Music size={24} />
           <span className="font-bold tracking-widest text-sm">TRACKS</span>
         </button>
+        <button 
+          onClick={() => setActiveTab('USERS')}
+          className={`py-4 border flex flex-col items-center justify-center gap-2 transition-all ${activeTab === 'USERS' ? 'bg-neutral-900 text-white dark:bg-white dark:text-black border-neutral-900 dark:border-white' : 'border-neutral-300 dark:border-neutral-800 text-neutral-500 hover:border-neutral-500'}`}
+        >
+          <Users size={24} />
+          <span className="font-bold tracking-widest text-sm">USERS</span>
+        </button>
       </div>
 
       <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-8 shadow-2xl relative overflow-hidden transition-colors duration-300">
         <div className="absolute top-0 left-0 w-1 h-full bg-brand-accent"></div>
         <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 text-neutral-900 dark:text-white">
             <Plus size={20} className="text-brand-accent"/>
-            ADD NEW {activeTab}
+            {activeTab === 'USERS' ? 'MANAGE USERS' : `ADD NEW ${activeTab}`}
         </h2>
         
         {activeTab === 'EVENTS' && <CreateEventForm />}
         {activeTab === 'MERCH' && <CreateMerchForm />}
         {activeTab === 'TRACKS' && <CreateTrackForm />}
+        {activeTab === 'USERS' && <ManageUsersForm />}
       </div>
     </div>
   );

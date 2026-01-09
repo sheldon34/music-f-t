@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { EventStatus, TrackSource } from '../types';
-import { EventService, MerchandiseService, TrackService } from '../services/api';
+import { AdminUserService, EventService, MerchandiseService, TrackService } from '../services/api';
 import { Upload, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -165,3 +165,136 @@ export const CreateMerchForm = () => {
       </form>
     );
   };
+
+export const ManageUsersForm = () => {
+  const { getAccessToken } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [user, setUser] = useState<Record<string, any> | null>(null);
+  const [updatesJson, setUpdatesJson] = useState('{}');
+  const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  const inputClass =
+    'bg-neutral-100 dark:bg-neutral-800 p-3 w-full border border-neutral-300 dark:border-neutral-700 text-neutral-900 dark:text-white focus:border-brand-accent dark:focus:border-white outline-none transition-colors';
+
+  const fetchUser = async () => {
+    setLoading(true);
+    setMsg(null);
+    try {
+      const token = await getAccessToken();
+      const result = await AdminUserService.getByEmail(email.trim(), token);
+      setUser(result);
+      setMsg({ type: 'success', text: 'User loaded.' });
+    } catch (err) {
+      console.error(err);
+      setUser(null);
+      setMsg({ type: 'error', text: 'User not found (or not authorized).' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const patchUser = async () => {
+    if (!user) return;
+
+    setLoading(true);
+    setMsg(null);
+    try {
+      const updates = JSON.parse(updatesJson || '{}') as Record<string, any>;
+      const token = await getAccessToken();
+      const id = String((user as any).user_id ?? (user as any).id ?? '');
+      if (!id) throw new Error('Missing user id');
+
+      const updated = await AdminUserService.update(id, updates, token);
+      setUser(updated);
+      setMsg({ type: 'success', text: 'User updated.' });
+    } catch (err) {
+      console.error(err);
+      setMsg({ type: 'error', text: 'Update failed. Ensure JSON is valid and you are admin.' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteUser = async () => {
+    if (!user) return;
+
+    setLoading(true);
+    setMsg(null);
+    try {
+      const token = await getAccessToken();
+      const id = String((user as any).user_id ?? (user as any).id ?? '');
+      if (!id) throw new Error('Missing user id');
+      await AdminUserService.delete(id, token);
+      setUser(null);
+      setMsg({ type: 'success', text: `User deleted: ${id}` });
+    } catch (err) {
+      console.error(err);
+      setMsg({ type: 'error', text: 'Delete failed. Check permissions.' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-4 font-mono text-sm">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <input
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Search by email"
+          className={inputClass}
+          autoComplete="email"
+        />
+        <button
+          disabled={loading || email.trim().length === 0}
+          onClick={fetchUser}
+          className="w-full bg-neutral-900 dark:bg-white text-white dark:text-black font-bold py-3 hover:bg-brand-accent dark:hover:bg-neutral-200 transition-colors disabled:opacity-50"
+        >
+          {loading ? <Loader2 className="animate-spin mx-auto" /> : 'SEARCH'}
+        </button>
+
+        <button
+          disabled={loading || !user}
+          onClick={deleteUser}
+          className="w-full border border-red-600 text-red-600 dark:border-red-500 dark:text-red-500 font-bold py-3 hover:bg-red-600 hover:text-white transition-colors disabled:opacity-50"
+        >
+          DELETE
+        </button>
+      </div>
+
+      <div>
+        <label className="block text-xs tracking-widest mb-2 text-black/70 dark:text-neutral-400">PATCH JSON</label>
+        <textarea
+          value={updatesJson}
+          onChange={(e) => setUpdatesJson(e.target.value)}
+          rows={6}
+          className={inputClass}
+          spellCheck={false}
+        />
+        <button
+          disabled={loading || !user}
+          onClick={patchUser}
+          className="mt-3 w-full bg-neutral-900 dark:bg-white text-white dark:text-black font-bold py-3 hover:bg-brand-accent dark:hover:bg-neutral-200 transition-colors disabled:opacity-50"
+        >
+          {loading ? <Loader2 className="animate-spin mx-auto" /> : 'APPLY PATCH'}
+        </button>
+      </div>
+
+      <div className="border border-neutral-300 dark:border-neutral-700 p-4 bg-white/50 dark:bg-neutral-900/50">
+        <div className="text-xs tracking-widest text-black/60 dark:text-neutral-500 mb-2">RESULT</div>
+        <pre className="whitespace-pre-wrap break-words text-xs leading-relaxed">
+          {user ? JSON.stringify(user, null, 2) : 'No user loaded.'}
+        </pre>
+      </div>
+
+      {msg && (
+        <p
+          className={`text-center ${msg.type === 'success' ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'}`}
+        >
+          {msg.text}
+        </p>
+      )}
+    </div>
+  );
+};

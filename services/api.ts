@@ -25,6 +25,30 @@ export const AuthService = {
   },
 };
 
+export const AdminUserService = {
+  getByEmail: async (email: string, token: string) => {
+    const response = await api.get<Record<string, any>>(`/auth/users/search?email=${encodeURIComponent(email)}`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    return response.data;
+  },
+  update: async (id: string, updates: Record<string, any>, token: string) => {
+    const response = await api.patch<Record<string, any>>(`/auth/users/${encodeURIComponent(id)}`, updates, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
+  delete: async (id: string, token: string) => {
+    const response = await api.delete<string>(`/auth/users/${encodeURIComponent(id)}`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    return response.data;
+  },
+};
+
 export const MerchandiseService = {
   getAll: async () => {
     const response = await api.get<MerchandiseDto[]>('/merchandise/getAll');
